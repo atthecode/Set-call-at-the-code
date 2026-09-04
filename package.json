@@ -1,13 +1,11 @@
 {
   "name": "setcall-at-the-code",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "AI location-coordination agent for independent filmmakers, powered by CALL-E.",
   "type": "module",
   "scripts": {
-    "dev": "vercel dev"
-  },
-  "engines": {
-    "node": ">=20"
+    "dev": "npx wrangler dev",
+    "deploy": "npx wrangler deploy"
   }
 }
