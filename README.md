@@ -14,18 +14,19 @@ SetCall makes that phone work structured while keeping the filmmaker in control 
 
 ## Working proof
 
-On 4 September 2026, SetCall completed its first successful CALL-E proof-of-concept phone test from ChatGPT. The repository now contains the web workflow that connects a filmmaker brief to CALL-E and returns structured location information.
+On 4 September 2026, SetCall completed its first successful CALL-E proof-of-concept phone test from ChatGPT.
 
-## CALL-E integration
+## Architecture
 
-The app calls CALL-E from server-side functions only. `CALLE_API_KEY` is never exposed to browser code.
+**Browser → Cloudflare Worker → CALL-E API**
 
-Runtime integration:
+The static app and API are served from one Cloudflare Worker project. The CALL-E key is stored only as the Worker secret `CALLE_API_KEY`.
 
-- `POST /api/create-call.js` → `POST https://api.heycall-e.com/v1/calls`
-- `GET /api/call-status.js` → `GET https://api.heycall-e.com/v1/calls/{call_id}`
+Runtime routes:
 
-The create-call endpoint requests structured location information including availability, filming permission, estimated cost, restrictions, accessibility, parking/loading, insurance/permits and decision-maker information.
+- `POST /api/create-call` → creates a CALL-E task after explicit user confirmation
+- `GET /api/call-status?call_id=...` → reads the CALL-E call result
+- all other routes → static assets from `public/`
 
 ## Safety and human control
 
@@ -33,25 +34,27 @@ The create-call endpoint requests structured location information including avai
 - CALL-E is instructed to identify itself as an AI voice agent calling on behalf of a filmmaker.
 - The agent is instructed not to pressure recipients, make payments or agree to binding terms.
 - Demo results are clearly labelled as sample data.
-- Without a server-side API key, the app deliberately shows **CALL-E NOT CONFIGURED** rather than pretending a call worked.
+- Without the Worker secret, the app shows **CALL-E NOT CONFIGURED** rather than pretending a call worked.
 
-## Deploy
+## Cloudflare deployment
 
-This prototype is designed for Vercel serverless functions.
+This repository is deliberately configured for Cloudflare Workers rather than a paid hosting platform.
 
-1. Import this GitHub repository into Vercel.
-2. Add `CALLE_API_KEY` as a server-side environment variable.
-3. Deploy.
-4. Open the app, create a location brief and explicitly approve the specific call.
+1. In Cloudflare Workers & Pages, create/import a Worker from this GitHub repository.
+2. Keep the project on the **Workers Free** plan if you do not want paid usage.
+3. Set the deploy command to `npx wrangler deploy` if Cloudflare asks for one.
+4. Add a Worker secret named `CALLE_API_KEY`.
+5. Deploy.
+6. Do not commit the real API key to GitHub.
 
-A template variable name is included in `.env.example`; never commit a real API key.
+The template variable name remains in `.env.example` for local development only.
 
 ## Project files
 
-- `index.html` — mobile-first SetCall interface
-- `api/create-call.js` — secure CALL-E call creation endpoint
-- `api/call-status.js` — secure CALL-E result/status endpoint
-- `.env.example` — environment-variable template
+- `public/index.html` — mobile-first SetCall interface
+- `src/worker.js` — Cloudflare Worker and secure CALL-E runtime integration
+- `wrangler.toml` — Cloudflare Worker configuration
+- `.env.example` — secret-name template
 
 ## Hackathon focus
 
