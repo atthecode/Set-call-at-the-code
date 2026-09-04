@@ -1,0 +1,7 @@
+name = "set-call-at-the-code"
+main = "src/worker.js"
+compatibility_date = "2026-09-04"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
