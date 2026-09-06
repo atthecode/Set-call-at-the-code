@@ -1,0 +1,5 @@
+[build]
+publish = "orish-family-beta"
+
+[build.environment]
+NODE_VERSION = "20"
